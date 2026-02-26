@@ -1,0 +1,2311 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MVP Treino Escalada </title>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#101a33; --muted:#8ea0c3; --txt:#eaf0ff;
+      --accent:#6ee7ff; --good:#22c55e; --warn:#f59e0b; --bad:#ef4444; --line:#223058;
+      --chip:#0f2446;
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --radius: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--txt);
+      background: radial-gradient(1000px 700px at 20% 10%, rgba(110,231,255,.15), transparent 55%),
+                  radial-gradient(900px 700px at 80% 30%, rgba(34,197,94,.12), transparent 55%),
+                  var(--bg);
+      min-height:100vh;
+    }
+    header{
+      padding:24px 16px 10px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    h1{margin:0 0 6px; font-size:20px; letter-spacing:.2px}
+    .sub{color:var(--muted); font-size:13px}
+    .wrap{max-width:1100px; margin:0 auto; padding:14px 16px 40px}
+    .tabs{display:flex; gap:10px; margin:14px 0}
+    .tabbtn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--txt);
+      padding:10px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:600;
+      transition:.15s;
+    }
+    .tabbtn[aria-selected="true"]{
+      border-color:rgba(110,231,255,.7);
+      background:rgba(110,231,255,.10);
+      box-shadow:0 0 0 4px rgba(110,231,255,.08) inset;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+    }
+    .card h2{margin:0 0 10px; font-size:15px}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width: 680px){ .row{grid-template-columns:1fr} }
+    label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px}
+    input, select, textarea{
+      width:100%;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color:var(--txt);
+      padding:10px 10px;
+      border-radius:12px;
+      outline:none;
+      transition:.15s;
+    }
+    textarea{min-height:90px; resize:vertical}
+    input:focus, select:focus, textarea:focus{
+      border-color:rgba(110,231,255,.7);
+      box-shadow:0 0 0 4px rgba(110,231,255,.09);
+    }
+    .btnbar{display:flex; gap:10px; flex-wrap:wrap; margin-top:10
+      
+      
+      x}
+      ton{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      color:var(--txt);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+      transition:.15s;
+    }
+    button:hover{transform:translateY(-1px)}
+    .primary{
+      border-color:rgba(110,231,255,.7);
+      background:rgba(110,231,255,.12);
+    }
+    .danger{
+      border-color:rgba(239,68,68,.7);
+      background:rgba(239,68,68,.10);
+    }
+    .muted{color:var(--muted); font-size:12px}
+    .split{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px}
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+      font-size:12px;
+      color:var(--muted);
+      font-family:var(--mono);
+    }
+    .list{display:flex; flex-direction:column; gap:10px}
+    .item{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(0,0,0,.15);
+      padding:10px;
+    }
+    .itemTop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
+    .itemTitle{font-weight:800; font-size:13px}
+    .chips{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
+    .chip{
+      font-size:12px;
+      padding:6px 8px;
+      border-radius:999px;
+      background:rgba(110,231,255,.08);
+      border:1px solid rgba(110,231,255,.18);
+      color:#cfefff;
+    }
+    .chip.gray{
+      background:rgba(255,255,255,.05);
+      border-color:rgba(255,255,255,.10);
+      color:var(--muted);
+    }
+    .badge{
+      font-weight:900;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+    }
+    .b-good{border-color:rgba(34,197,94,.5); background:rgba(34,197,94,.12); color:#bff7d0}
+    .b-warn{border-color:rgba(245,158,11,.55); background:rgba(245,158,11,.12); color:#ffe1b1}
+    .b-bad{border-color:rgba(239,68,68,.55); background:rgba(239,68,68,.12); color:#ffd0d0}
+    .hr{height:1px; background:var(--line); margin:12px 0}
+    .mono{font-family:var(--mono)}
+    .small{font-size:12px}
+    .hidden{display:none !important}
+    /* ===== Modal Customizado (Transparente) ===== */
+    .modal-overlay{
+      display:none;
+      position:fixed;
+      top:0; left:0; right:0; bottom:0;
+      background:rgba(0,0,0,.5);
+      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);
+      z-index:99999;
+      align-items:center;
+      justify-content:center;
+    }
+    .modal-overlay.show{
+      display:flex;
+    }
+    .modal-box{
+      background: linear-gradient(135deg, #1a2847, #0f1728);
+      border:1px solid rgba(110,231,255,.5);
+      border-radius:20px;
+      padding:32px;
+      max-width:480px;
+      width:92%;
+      box-shadow: 0 25px 100px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.15);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      animation:slideIn .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes slideIn{
+      from{
+        opacity:0;
+        transform:translateY(-30px) scale(.92);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+      }
+    }
+    .modal-title{
+      font-size:18px;
+      font-weight:700;
+      color:#ffffff;
+      margin:0 0 12px;
+    }
+    .modal-message{
+      color:#d1d5db;
+      font-size:14px;
+      line-height:1.6;
+      margin:0 0 20px;
+    }
+    .modal-input{
+      width:100%;
+      background:rgba(0,0,0,.2);
+      border:1px solid rgba(110,231,255,.3);
+      color:#ffffff;
+      padding:12px 12px;
+      border-radius:12px;
+      outline:none;
+      margin:0 0 16px;
+      font-family:var(--mono);
+      transition:.15s;
+    }
+    .modal-input::placeholder{
+      color:rgba(255,255,255,.5);
+    }
+    .modal-input:focus{
+      border-color:rgba(110,231,255,.8);
+      box-shadow:0 0 0 4px rgba(110,231,255,.2);
+    }
+    .modal-buttons{
+      display:flex;
+      gap:12px;
+      justify-content:flex-end;
+    }
+    .modal-btn{
+      padding:10px 16px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(255,255,255,.08);
+      color:#ffffff;
+      font-weight:600;
+      cursor:pointer;
+      transition:.15s;
+      font-size:13px;
+    }
+    .modal-btn:hover{
+      background:rgba(255,255,255,.15);
+      transform:translateY(-1px);
+    }
+    .modal-btn.primary{
+      border-color:rgba(110,231,255,.6);
+      background:rgba(110,231,255,.25);
+      color:#ffffff;
+    }
+    .modal-btn.primary:hover{
+      background:rgba(110,231,255,.35);
+    }
+    .modal-btn.danger{
+      border-color:rgba(239,68,68,.6);
+      background:rgba(239,68,68,.25);
+      color:#ffffff;
+    }
+    .modal-btn.danger:hover{
+      background:rgba(239,68,68,.35);
+    }
+    .modal-btn:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+    }
+/* ===== Custom Select (substitui TODOS os <select>) ===== */
+select.native-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Wrapper ocupa o lugar do select */
+.cselect {
+  position: relative;
+  width: 100%;
+}
+
+/* Botão com mesmo estilo do input */
+.cselect-btn{
+  width:100%;
+  text-align:left;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--line);
+  color: var(--txt);
+  padding:10px 10px;
+  border-radius:12px;
+  cursor:pointer;
+  user-select: none;
+}
+
+.cselect-btn:focus{
+  outline:none;
+  border-color: rgba(110,231,255,.7);
+  box-shadow: 0 0 0 4px rgba(110,231,255,.09);
+}
+
+/* Menu: transparente + blur + mesma vibe do site */
+.cselect-menu{
+  position:absolute;
+  left:0; right:0;
+  margin-top:8px;
+  z-index:9999;
+
+  max-height:260px;
+  overflow:auto;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+
+  background: rgba(16,26,51,.62);      /* transparente */
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  box-shadow: 0 18px 55px rgba(0,0,0,.45);
+}
+
+.cselect-menu.hidden{ display:none; }
+
+.cselect-search{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px;
+  background: rgba(16,26,51,.75);
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.cselect-search input{
+  width:100%;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  color: var(--txt);
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.cselect-item{
+  padding:10px 12px;
+  cursor:pointer;
+  color: var(--txt);
+}
+
+.cselect-item:hover{
+  background: rgba(110,231,255,.12);
+}
+
+.cselect-item[aria-selected="true"]{
+  background: rgba(110,231,255,.18);
+  border-left: 3px solid rgba(110,231,255,.7);
+}
+
+.cselect-caret{ opacity:.85; }
+.cselect-muted{ opacity:.75; font-size: 12px; }
+
+  </style>
+</head>
+<body>
+<header>
+  <h1>MVP – Treinos de Escalada Indoor</h1>
+  <div class="sub">Treinador cria treinos detalhados. Aluno devolve status, motivo, dor no dedo e RPE. (Tudo local via <span class="mono">localStorage</span>.)</div>
+
+  <div class="tabs" role="tablist" aria-label="Papéis">
+    <button class="tabbtn" id="tabCoach" role="tab" aria-selected="true" aria-controls="panelCoach">Treinador</button>
+    <button class="tabbtn" id="tabStudent" role="tab" aria-selected="false" aria-controls="panelStudent">Aluno</button>
+    <button class="tabbtn" id="tabData" role="tab" aria-selected="false" aria-controls="panelData">Dados</button>
+    <button class="tabbtn" id="tabEval" role="tab" aria-selected="false" aria-controls="panelEval">Avaliar</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- TREINADOR -->
+  <section id="panelCoach" role="tabpanel" aria-labelledby="tabCoach">
+    <div class="grid">
+      <div class="card">
+        <div class="split">
+          <h2>Criar treino (sessão detalhada)</h2>
+          <span class="pill" id="coachStorageInfo">—</span>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="coachAluno">Aluno</label>
+            <input id="coachAluno" placeholder="Ex: Maria (A001)" />
+          </div>
+          <div>
+            <label for="coachData">Data</label>
+            <input id="coachData" type="date" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label for="coachTreinoId">TreinoID</label>
+            <input id="coachTreinoId" placeholder="Ex: A001-2026-02-12" />
+            <div class="muted">Dica: clique em “Gerar TreinoID” pra criar automaticamente.</div>
+          </div>
+          <div>
+            <label for="coachObjetivoDia">Objetivo do dia</label>
+            <select id="coachObjetivoDia">
+              <option value="Força">Força</option>
+              <option value="Técnica">Técnica</option>
+              <option value="Resistência">Resistência</option>
+              <option value="Volume">Volume</option>
+              <option value="Regenerativo">Regenerativo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="btnbar">
+          <button id="btnGerarId" class="primary">Gerar TreinoID</button>
+          <button id="btnCriarTreino" class="primary">Criar treino</button>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Adicionar item (1 linha = 1 bloco/exercício)</h2>
+
+        <div class="row">
+          <div>
+            <label for="itemBloco">Bloco</label>
+            <select id="itemBloco">
+              <option>Aquecimento</option>
+              <option>Técnica</option>
+              <option>Boulder</option>
+              <option>Via</option>
+              <option>Força</option>
+              <option>Condicionamento</option>
+              <option>Mobilidade</option>
+              <option>Prehab</option>
+            </select>
+          </div>
+          <div>
+            <label for="itemCategoria">Categoria (analítica)</label>
+            <select id="itemCategoria">
+              <option value="Technique">Technique</option>
+              <option value="Finger strength">Finger strength</option>
+              <option value="Pull strength">Pull strength</option>
+              <option value="Power">Power</option>
+              <option value="Power endurance">Power endurance</option>
+              <option value="Aerobic endurance">Aerobic endurance</option>
+              <option value="Mobility">Mobility</option>
+              <option value="Prehab">Prehab</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label for="itemExercicio">Exercício</label>
+            <input id="itemExercicio" placeholder="Ex: Hangboard 7/3, Boulder limit, ARC 20min..." />
+          </div>
+          <div>
+            <label for="itemMetrica">Métrica principal</label>
+            <select id="itemMetrica">
+              <option value="Tentativas">Tentativas</option>
+              <option value="Moves">Moves</option>
+              <option value="Minutos">Minutos</option>
+              <option value="Séries">Séries</option>
+              <option value="Reps">Reps</option>
+              <option value="Metros">Metros</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label for="itemQtd">Quantidade</label>
+            <input id="itemQtd" type="number" min="0" step="1" placeholder="Ex: 6" />
+          </div>
+          <div>
+            <label for="itemIntensTipo">Intensidade (tipo)</label>
+            <select id="itemIntensTipo">
+              <option value="RPE">RPE</option>
+              <option value="Grade">Grade</option>
+              <option value="%">%</option>
+              <option value="Peso">Peso</option>
+              <option value="Livre">Livre</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label for="itemIntensVal">Intensidade (valor)</label>
+            <input id="itemIntensVal" placeholder="Ex: 8, V5, 70%, +10kg..." />
+          </div>
+          <div>
+            <label for="itemMin">Min planejados</label>
+            <input id="itemMin" type="number" min="0" step="5" placeholder="Ex: 15" />
+          </div>
+        </div>
+
+        <div style="margin-top:10px">
+          <label for="itemNotas">Notas do treinador</label>
+          <textarea id="itemNotas" placeholder="Pausas, técnica, foco do bloco, etc."></textarea>
+        </div>
+
+        <div class="btnbar">
+          <button id="btnAddItem" class="primary">Adicionar item ao treino</button>
+        </div>
+
+        <div class="muted" style="margin-top:10px">
+          ✅ Para testar: crie um treino, adicione 2–5 itens, depois vá na aba “Aluno” e mande o retorno usando o TreinoID.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="split">
+          <h2>Treinos criados</h2>
+          <button id="btnLimparTudo" class="danger">Apagar tudo</button>
+        </div>
+        <div class="muted">Clique num treino para ver itens. Use o TreinoID para o aluno responder.</div>
+        <div class="hr"></div>
+        <div id="listaTreinos" class="list"></div>
+      </div>
+    </div>
+  </section>
+  <!-- AVALIAÇÃO -->
+  <section id="panelEval" role="tabpanel" aria-labelledby="tabEval" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>Avaliação — Físico / Técnico / Mental</h2>
+        <div class="muted">Registrar sessões e calcular métricas derivadas (PhysicalLoad, TechScore, MentalScore, SessionVolume).</div>
+        <div class="hr"></div>
+
+        <div class="row">
+          <div>
+            <label>Data</label>
+            <input id="evalDate" type="date" />
+          </div>
+          <div>
+            <label>Tipo</label>
+            <select id="evalType">
+              <option value="Mista">Mista</option>
+              <option value="Física">Física</option>
+              <option value="Técnica">Técnica</option>
+              <option value="Mental">Mental</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <div>
+            <label>Duração (min)</label>
+            <input id="evalDuration" type="number" min="0" value="30" />
+          </div>
+          <div>
+            <label>RPE (1–10)</label>
+            <input id="evalRpe" type="number" min="1" max="10" value="6" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <div>
+            <label>Tentativas (attempts)</label>
+            <input id="evalAttempts" type="number" min="0" value="0" />
+          </div>
+          <div>
+            <label>Conclusões (successes)</label>
+            <input id="evalSuccesses" type="number" min="0" value="0" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <div>
+            <label>Erros / quedas</label>
+            <input id="evalErrors" type="number" min="0" value="0" />
+          </div>
+          <div>
+            <label>Avaliação técnica (1–10)</label>
+            <input id="evalTech" type="number" min="1" max="10" value="6" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <div>
+            <label>Foco (1–10)</label>
+            <input id="evalFocus" type="number" min="1" max="10" value="7" />
+          </div>
+          <div>
+            <label>Confiança (1–10)</label>
+            <input id="evalConfidence" type="number" min="1" max="10" value="6" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <div>
+            <label>Stress (1–10)</label>
+            <input id="evalStress" type="number" min="1" max="10" value="3" />
+          </div>
+          <div>
+            <label>Motivação (1–10)</label>
+            <input id="evalMotivation" type="number" min="1" max="10" value="7" />
+          </div>
+        </div>
+
+        <div style="margin-top:8px">
+          <label>Notas</label>
+          <textarea id="evalNotes" placeholder="Observações..." style="min-height:80px"></textarea>
+        </div>
+
+        <div class="btnbar" style="margin-top:10px">
+          <button id="evalSave" class="primary">Salvar sessão</button>
+          <button id="evalQuick" title="Popula com valores rápidos">Sessão rápida</button>
+          <button id="evalExport">Exportar CSV</button>
+          <button id="evalImport">Importar CSV</button>
+        </div>
+
+        <div class="hr"></div>
+        <h3 style="margin:6px 0 8px">Sessões registradas</h3>
+        <div id="evalSummary" class="muted" style="margin-bottom:8px">—</div>
+        <div id="evalSessionsList" class="list" style="max-height:260px;overflow:auto"></div>
+      </div>
+
+      <div class="card">
+        <h2>Visão rápida</h2>
+        <div class="muted">WeeklyVolume (soma de SessionVolume por dia)</div>
+        <div id="evalWeekly" style="margin-top:8px"></div>
+        <div class="hr"></div>
+        <h3>Última sessão</h3>
+        <div id="evalLast" class="muted">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALUNO -->
+  <section id="panelStudent" role="tabpanel" aria-labelledby="tabStudent" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <div class="split">
+          <h2>Retorno do aluno</h2>
+          <span class="pill" id="studentStorageInfo">—</span>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="alunoTreinoId">TreinoID</label>
+            <select id="alunoTreinoId"></select>
+            <div class="muted">Se estiver vazio, crie um treino na aba Treinador.</div>
+          </div>
+          <div>
+            <label for="alunoNome">Aluno (confirmação)</label>
+            <input id="alunoNome" placeholder="Ex: Maria (A001)" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label for="alunoStatus">Status</label>
+            <select id="alunoStatus">
+              <option value="Concluído">Concluído</option>
+              <option value="Parcial">Parcial</option>
+              <option value="Não fez">Não fez</option>
+            </select>
+          </div>
+          <div>
+            <label for="alunoMotivo">Motivo (se Parcial/Não fez)</label>
+            <select id="alunoMotivo">
+              <option value="">—</option>
+              <option value="Sem tempo">Sem tempo</option>
+              <option value="Dor">Dor</option>
+              <option value="Cansaço">Cansaço</option>
+              <option value="Sem acesso">Sem acesso</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label for="alunoDor">Dor no dedo (0–10)</label>
+            <input id="alunoDor" type="number" min="0" max="10" step="1" value="0" />
+          </div>
+          <div>
+            <label for="alunoRpe">RPE do treino (1–10)</label>
+            <input id="alunoRpe" type="number" min="1" max="10" step="1" value="6" />
+          </div>
+        </div>
+
+        <div style="margin-top:10px">
+          <label for="alunoComentario">Comentários</label>
+          <textarea id="alunoComentario" placeholder="Ex: doeu o dedo no crimp, sem tempo, achei pesado, etc."></textarea>
+        </div>
+
+        <div class="btnbar">
+          <button id="btnEnviarRetorno" class="primary">Enviar retorno</button>
+        </div>
+
+        <div class="hr"></div>
+        <h2>Detalhes do treino selecionado</h2>
+        <div id="previewTreinoAluno" class="muted">Selecione um TreinoID acima.</div>
+      </div>
+
+      <div class="card">
+        <h2>Retornos recebidos</h2>
+        <div class="muted">Aqui você vê o histórico de retornos (simulação).</div>
+        <div class="hr"></div>
+        <div id="listaRetornos" class="list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DADOS -->
+  <section id="panelData" role="tabpanel" aria-labelledby="tabData" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>Exportar / Copiar / Restaurar dados</h2>
+        <div class="muted">Backup local, exportar para Google Sheets, ou restaurar dados.</div>
+        
+        <div style="margin:15px 0; border-top:1px solid var(--line); padding-top:12px">
+          <div style="font-weight:600; margin-bottom:8px">📋 Formatos disponíveis:</div>
+          <div class="btnbar">
+            <button id="btnExportJSON" class="primary">JSON (Backup)</button>
+            <button id="btnExportCSV">CSV (Excel/Sheets)</button>
+            <button id="btnExportTSV">TSV (Colar direto)</button>
+            <button id="btnImport" class="primary">Restaurar</button>
+          </div>
+        </div>
+
+        <div style="margin-top:15px">
+          <textarea id="exportArea" spellcheck="false" style="min-height:260px; font-family:var(--mono)"></textarea>
+        </div>
+        
+        <div style="margin-top:12px; padding:12px; background:rgba(110,231,255,.05); border-radius:10px; border-left:3px solid rgba(110,231,255,.3)">
+          <div style="font-size:12px; line-height:1.7; color:#d1d5db">
+            <b style="color:#ffffff">✨ Como usar:</b><br/>
+            
+            <b>1️⃣ JSON (Backup seguro):</b> Guarde em um arquivo para restaurar depois<br/>
+            
+            <b>2️⃣ CSV (Google Sheets/Excel):</b> 
+            <ol style="margin:4px 0; padding-left:20px">
+              <li>Clique "CSV (Excel/Sheets)"</li>
+              <li>Copie o conteúdo</li>
+              <li>Abra <a href="https://docs.google.com/spreadsheets/create" target="_blank" style="color:rgba(110,231,255,.9)">Google Sheets</a></li>
+              <li>Cole em qualquer célula</li>
+            </ol>
+            
+            <b>3️⃣ TSV (Colar direto - mais rápido):</b> Cole direto no Sheets (Ctrl+V) sem abrir editor<br/>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Análise detalhada</h2>
+        <div class="muted">Métricas para validar modelo de "sessão detalhada" e planejar iterações.</div>
+        <div class="hr"></div>
+        <div id="miniMetricas" class="list"></div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px">
+          <h2 style="margin:0">⚙️ Integrações Automáticas</h2>
+          <div id="syncStatus" style="font-size:11px; padding:6px 10px; border-radius:8px; background:rgba(34,197,94,.15); color:#bff7d0; border:1px solid rgba(34,197,94,.3)">✓ Offline</div>
+        </div>
+        <div class="muted">Sincronize seus dados automaticamente com GitHub ou seu servidor backend.</div>
+        
+        <div style="margin:16px 0; padding:12px; background:rgba(110,231,255,.06); border-radius:10px; border-left:3px solid rgba(110,231,255,.3)">
+          <b style="color:#ffffff">🔗 GitHub Gist (Backup privado)</b>
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label>Token GitHub (Personal Access Token)</label>
+              <input id="githubToken" type="password" placeholder="ghp_xxxxxxxxxxxxxxxx" />
+              <div class="muted" style="font-size:11px; margin-top:4px">Crie em: <a href="https://github.com/settings/tokens" target="_blank" style="color:rgba(110,231,255,.8)">github.com/settings/tokens</a></div>
+            </div>
+            <div>
+              <label>Gist ID (deixe em branco para criar novo)</label>
+              <input id="gistId" placeholder="abc123def456..." />
+              <div class="muted" style="font-size:11px; margin-top:4px">Será preenchido automaticamente</div>
+            </div>
+          </div>
+          <div class="btnbar" style="margin-top:12px">
+            <button id="btnSyncGithub" class="primary">📤 Sincronizar com GitHub</button>
+            <button id="btnLoadGithub">📥 Carregar do GitHub</button>
+          </div>
+        </div>
+
+        <div style="margin:16px 0; padding:12px; background:rgba(239,68,68,.06); border-radius:10px; border-left:3px solid rgba(239,68,68,.3)">
+          <b style="color:#ffffff">🚀 Backend API (Seu servidor)</b>
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label>URL do Backend</label>
+              <input id="backendUrl" type="url" placeholder="https://api.seuservidor.com/treinos" />
+              <div class="muted" style="font-size:11px; margin-top:4px">Ex: https://seu-app.herokuapp.com/api/workouts</div>
+            </div>
+            <div>
+              <label>Auth Token (opcional)</label>
+              <input id="backendToken" type="password" placeholder="Bearer token..." />
+              <div class="muted" style="font-size:11px; margin-top:4px">Para APIs que exigem autenticação</div>
+            </div>
+          </div>
+          <div class="btnbar" style="margin-top:12px">
+            <button id="btnSyncBackend" class="primary">📤 Enviar para Backend</button>
+            <button id="btnLoadBackend">📥 Carregar do Backend</button>
+          </div>
+        </div>
+
+        <div style="margin:16px 0; padding:12px; background:rgba(245,158,11,.06); border-radius:10px; border-left:3px solid rgba(245,158,11,.3)">
+          <b style="color:#ffffff">⏱️ Auto-Sincronização</b>
+          <div style="margin-top:10px">
+            <label style="display:flex; align-items:center; gap:8px; margin:0">
+              <input id="autoSyncToggle" type="checkbox" style="width:18px; height:18px; cursor:pointer" />
+              <span style="color:#d1d5db">Sincronizar automaticamente a cada</span>
+            </label>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div>
+              <input id="autoSyncInterval" type="number" min="5" max="3600" value="60" style="max-width:80px" />
+              <span style="color:#d1d5db; font-size:12px">segundos</span>
+            </div>
+            <div style="display:flex; gap:10px">
+              <button id="btnTestSync" class="primary" style="width:auto">🧪 Testar Sincronização</button>
+              <button id="btnSaveConfig" style="width:auto">💾 Salvar Configurações</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1">
+        <h2>🚀 Google Sheets Integrado</h2>
+        <div class="muted">Abra uma planilha Google e importe seus dados em segundos.</div>
+        <div class="btnbar" style="margin:12px 0">
+          <a href="https://docs.google.com/spreadsheets/create" target="_blank" style="text-decoration:none">
+            <button class="primary">↗️ Abrir Google Sheets</button>
+          </a>
+        </div>
+        <div style="padding:12px; background:rgba(34,197,94,.08); border-radius:10px; border-left:3px solid rgba(34,197,94,.3)">
+          <div style="font-size:12px; line-height:1.7; color:#d1d5db">
+            <b style="color:#ffffff">📊 Passo-a-passo:</b><br/>
+            
+            <b style="color:#bff7d0">1. Exportar dados:</b> Clique em "TSV (Colar direto)" acima<br/>
+            
+            <b style="color:#bff7d0">2. Abrir planilha:</b> Clique no botão "Abrir Google Sheets"<br/>
+            
+            <b style="color:#bff7d0">3. Colar dados:</b> Clique na célula A1 e pressione <span style="background:rgba(255,255,255,.1); padding:2px 6px; border-radius:4px">Ctrl+V</span><br/>
+            
+            <b style="color:#bff7d0">4. Formatar:</b> Os dados virão em colunas separadas. Use "Dados" → "Dividir em colunas" se necessário.<br/>
+            
+            <b style="color:#bff7d0">5. Compartilhar:</b> Vá em "Compartilhar" e envie o link para seu treinador ou alunos!
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal-box">
+    <h2 id="modalTitle" class="modal-title"></h2>
+    <p id="modalMessage" class="modal-message"></p>
+    <input id="modalInput" type="text" class="modal-input hidden" />
+    <div class="modal-buttons">
+      <button id="modalBtnCancel" class="modal-btn">Cancelar</button>
+      <button id="modalBtnConfirm" class="modal-btn primary">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== Storage Keys =====
+  const KEY = {
+    workouts: "mvp_workouts_v1", // [{id, date, student, goal, items:[...], createdAt}]
+    feedback: "mvp_feedback_v1"  // [{id, workoutId, studentName, status, reason, fingerPain, rpe, comment, ts}]
+  };
+
+  // ===== Helpers =====
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  function nowISO(){
+    return new Date().toISOString();
+  }
+  function todayYYYYMMDD(){
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function load(key, fallback){
+    try{
+      const raw = localStorage.getItem(key);
+      if(!raw) return fallback;
+      return JSON.parse(raw);
+    }catch(e){
+      console.warn("Falha ao carregar", key, e);
+      return fallback;
+    }
+  }
+  function save(key, value){
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+  function uid(prefix="id"){
+    return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
+  }
+  function escapeHtml(str){
+    return String(str ?? "").replace(/[&<>"']/g, s => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[s]));
+  }
+
+  function badgeForStatus(status){
+    if(status === "Concluído") return `<span class="badge b-good">Concluído</span>`;
+    if(status === "Parcial") return `<span class="badge b-warn">Parcial</span>`;
+    if(status === "Não fez") return `<span class="badge b-bad">Não fez</span>`;
+    return `<span class="badge">${escapeHtml(status)}</span>`;
+  }
+
+  // ===== Modal Customizado (substitui alert/confirm/prompt) =====
+  const modalOverlay = $("#modalOverlay");
+  const modalTitle = $("#modalTitle");
+  const modalMessage = $("#modalMessage");
+  const modalInput = $("#modalInput");
+  const modalBtnCancel = $("#modalBtnCancel");
+  const modalBtnConfirm = $("#modalBtnConfirm");
+
+  let modalResolve = null;
+  let modalInputMode = false;
+
+  function showModal(title, message, type = "alert", inputPlaceholder = ""){
+    modalTitle.textContent = title;
+    modalMessage.textContent = message;
+    modalInputMode = type === "prompt";
+
+    if(type === "alert"){
+      modalBtnCancel.classList.add("hidden");
+      modalBtnConfirm.textContent = "OK";
+      modalInput.classList.add("hidden");
+    } else if(type === "confirm"){
+      modalBtnCancel.classList.remove("hidden");
+      modalBtnConfirm.textContent = "Confirmar";
+      modalBtnConfirm.classList.remove("danger");
+      modalInput.classList.add("hidden");
+    } else if(type === "danger"){
+      modalBtnCancel.classList.remove("hidden");
+      modalBtnConfirm.textContent = "Apagar";
+      modalBtnConfirm.classList.add("danger");
+      modalInput.classList.add("hidden");
+    } else if(type === "prompt"){
+      modalBtnCancel.classList.remove("hidden");
+      modalBtnConfirm.textContent = "OK";
+      modalBtnConfirm.classList.remove("danger");
+      modalInput.classList.remove("hidden");
+      modalInput.placeholder = inputPlaceholder;
+      modalInput.value = "";
+      setTimeout(()=>modalInput.focus(), 100);
+    }
+
+    modalOverlay.classList.add("show");
+  }
+
+  function closeModal(){
+    modalOverlay.classList.remove("show");
+    if(modalResolve) modalResolve(null);
+    modalResolve = null;
+  }
+
+  function modalAlert(title, message){
+    return new Promise(resolve=>{
+      modalResolve = resolve;
+      showModal(title, message, "alert");
+    });
+  }
+
+  function modalConfirm(title, message){
+    return new Promise(resolve=>{
+      modalResolve = (result)=>resolve(result);
+      showModal(title, message, "confirm");
+    });
+  }
+
+  function modalDanger(title, message){
+    return new Promise(resolve=>{
+      modalResolve = (result)=>resolve(result);
+      showModal(title, message, "danger");
+    });
+  }
+
+  function modalPrompt(title, message, placeholder=""){
+    return new Promise(resolve=>{
+      modalResolve = (result)=>resolve(result);
+      showModal(title, message, "prompt", placeholder);
+    });
+  }
+
+  modalBtnCancel.addEventListener("click", closeModal);
+  modalBtnConfirm.addEventListener("click", ()=>{
+    const resolve = modalResolve;
+    closeModal();
+    if(resolve) resolve(modalInputMode ? modalInput.value : true);
+  });
+
+  modalInput.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter"){
+      const resolve = modalResolve;
+      closeModal();
+      if(resolve) resolve(modalInput.value);
+    }
+  });
+
+  modalOverlay.addEventListener("click", (e)=>{
+    if(e.target === modalOverlay) closeModal();
+  });
+
+  // Tecla ESC fecha modal
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape" && modalOverlay.classList.contains("show")) closeModal();
+  });
+
+  // ===== State =====
+  let workouts = load(KEY.workouts, []);
+  let feedback = load(KEY.feedback, []);
+
+  // ===== Tabs =====
+  const tabCoach = $("#tabCoach");
+  const tabStudent = $("#tabStudent");
+  const tabData = $("#tabData");
+  const tabEval = $("#tabEval");
+  const panelCoach = $("#panelCoach");
+  const panelStudent = $("#panelStudent");
+  const panelData = $("#panelData");
+  const panelEval = $("#panelEval");
+
+  function setTab(active){
+    const map = {
+      coach: [tabCoach, panelCoach],
+      student: [tabStudent, panelStudent],
+      data: [tabData, panelData],
+      eval: [tabEval, panelEval],
+    };
+    for(const k of Object.keys(map)){
+      const [t,p] = map[k];
+      const on = (k === active);
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      p.classList.toggle("hidden", !on);
+    }
+    if(active === "student"){ refreshStudentUI(); }
+    if(active === "data"){ refreshDataUI(); }
+  }
+  tabCoach.addEventListener("click", ()=>setTab("coach"));
+  tabStudent.addEventListener("click", ()=>setTab("student"));
+  tabData.addEventListener("click", ()=>setTab("data"));
+
+  // ===== Coach: create workout =====
+  const coachAluno = $("#coachAluno");
+  const coachData = $("#coachData");
+  const coachTreinoId = $("#coachTreinoId");
+  const coachObjetivoDia = $("#coachObjetivoDia");
+
+  const itemBloco = $("#itemBloco");
+  const itemCategoria = $("#itemCategoria");
+  const itemExercicio = $("#itemExercicio");
+  const itemMetrica = $("#itemMetrica");
+  const itemQtd = $("#itemQtd");
+  const itemIntensTipo = $("#itemIntensTipo");
+  const itemIntensVal = $("#itemIntensVal");
+  const itemMin = $("#itemMin");
+  const itemNotas = $("#itemNotas");
+
+  const btnGerarId = $("#btnGerarId");
+  const btnCriarTreino = $("#btnCriarTreino");
+  const btnAddItem = $("#btnAddItem");
+  const btnLimparTudo = $("#btnLimparTudo");
+
+  coachData.value = todayYYYYMMDD();
+
+  function updateStorageInfo(){
+    $("#coachStorageInfo").textContent = `${workouts.length} treinos • ${feedback.length} retornos`;
+    $("#studentStorageInfo").textContent = `${workouts.length} treinos • ${feedback.length} retornos`;
+  }
+
+  btnGerarId.addEventListener("click", ()=>{
+    const student = coachAluno.value.trim() || "ALUNO";
+    const slug = student.replace(/\s+/g,"").slice(0,6).toUpperCase();
+    const date = coachData.value || todayYYYYMMDD();
+    coachTreinoId.value = `${slug}-${date}`;
+  });
+
+  btnCriarTreino.addEventListener("click", async ()=>{
+    const student = coachAluno.value.trim();
+    const date = coachData.value;
+    const id = coachTreinoId.value.trim();
+
+    if(!student){ await modalAlert("Atenção", "Preencha o Aluno."); return; }
+    if(!date){ await modalAlert("Atenção", "Selecione a data."); return; }
+    if(!id){ await modalAlert("Atenção", "Preencha ou gere o TreinoID."); return; }
+
+    const exists = workouts.some(w => w.id === id);
+    if(exists){ await modalAlert("Erro", "Já existe um treino com esse TreinoID."); return; }
+
+    const w = {
+      id,
+      date,
+      student,
+      goal: coachObjetivoDia.value,
+      items: [],
+      createdAt: nowISO()
+    };
+    workouts.unshift(w);
+    save(KEY.workouts, workouts);
+    renderWorkouts();
+    refreshStudentUI();
+    updateStorageInfo();
+
+    await modalAlert("Sucesso", "Treino criado! Agora adicione itens.");
+  });
+
+  btnAddItem.addEventListener("click", async ()=>{
+    const id = coachTreinoId.value.trim();
+    if(!id){ await modalAlert("Atenção", "Preencha o TreinoID (e crie o treino antes)."); return; }
+
+    const w = workouts.find(x => x.id === id);
+    if(!w){ await modalAlert("Erro", "TreinoID não encontrado. Clique em 'Criar treino' primeiro."); return; }
+
+    const ex = itemExercicio.value.trim();
+    if(!ex){ await modalAlert("Atenção", "Preencha o exercício."); return; }
+
+    const qtd = Number(itemQtd.value);
+    const mins = Number(itemMin.value);
+
+    const item = {
+      itemId: uid("item"),
+      bloco: itemBloco.value,
+      categoria: itemCategoria.value,
+      exercicio: ex,
+      metrica: itemMetrica.value,
+      quantidade: Number.isFinite(qtd) ? qtd : 0,
+      intensTipo: itemIntensTipo.value,
+      intensVal: itemIntensVal.value.trim(),
+      min: Number.isFinite(mins) ? mins : 0,
+      notas: itemNotas.value.trim()
+    };
+
+    w.items.push(item);
+    save(KEY.workouts, workouts);
+    renderWorkouts();
+    refreshStudentUI();
+    updateStorageInfo();
+
+    // reset campos do item (mantém bloco/categoria se quiser)
+    itemExercicio.value = "";
+    itemQtd.value = "";
+    itemIntensVal.value = "";
+    itemMin.value = "";
+    itemNotas.value = "";
+    itemExercicio.focus();
+  });
+
+  btnLimparTudo.addEventListener("click", async ()=>{
+    const confirmed = await modalDanger("Atenção", "Apagar TODOS os treinos e retornos deste navegador?");
+    if(!confirmed) return;
+    workouts = [];
+    feedback = [];
+    save(KEY.workouts, workouts);
+    save(KEY.feedback, feedback);
+    renderWorkouts();
+    refreshStudentUI();
+    refreshDataUI();
+    updateStorageInfo();
+  });
+
+  // ===== Render workouts list =====
+  const listaTreinos = $("#listaTreinos");
+
+  function renderWorkouts(){
+    if(workouts.length === 0){
+      listaTreinos.innerHTML = `<div class="muted">Nenhum treino ainda.</div>`;
+      return;
+    }
+
+    listaTreinos.innerHTML = workouts.map(w => {
+      const totalMin = w.items.reduce((a,b)=>a+(Number(b.min)||0),0);
+      const cats = [...new Set(w.items.map(i=>i.categoria))].slice(0,4);
+      const catsChips = cats.map(c=>`<span class="chip gray">${escapeHtml(c)}</span>`).join("");
+
+      return `
+        <div class="item">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">${escapeHtml(w.id)} <span class="muted">• ${escapeHtml(w.date)}</span></div>
+              <div class="muted">${escapeHtml(w.student)} • Objetivo: ${escapeHtml(w.goal)}</div>
+            </div>
+            <div class="mono small">${w.items.length} itens • ${totalMin} min</div>
+          </div>
+          <div class="chips">
+            <span class="chip">Copiar ID</span>
+            ${catsChips || `<span class="chip gray">Sem itens ainda</span>`}
+          </div>
+          <div class="hr"></div>
+          ${w.items.length ? w.items.map(i => `
+            <div class="muted" style="margin-bottom:6px">
+              <b>${escapeHtml(i.bloco)}</b> • ${escapeHtml(i.categoria)} — ${escapeHtml(i.exercicio)}
+              <span class="mono">(${escapeHtml(i.metrica)}: ${escapeHtml(i.quantidade)} • ${escapeHtml(i.intensTipo)} ${escapeHtml(i.intensVal || "")} • ${escapeHtml(i.min)}min)</span>
+            </div>
+          `).join("") : `<div class="muted">Adicione itens do treino à esquerda.</div>`}
+          <div class="btnbar" style="margin-top:10px">
+            <button data-copy="${escapeHtml(w.id)}">Copiar TreinoID</button>
+            <button class="danger" data-del="${escapeHtml(w.id)}">Excluir treino</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    // actions
+    listaTreinos.querySelectorAll("[data-copy]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const id = btn.getAttribute("data-copy");
+        try{
+          await navigator.clipboard.writeText(id);
+          await modalAlert("Sucesso", "TreinoID copiado!");
+        }catch{
+          await modalPrompt("Copiar TreinoID", "Copie manualmente:", id);
+        }
+      });
+    });
+    listaTreinos.querySelectorAll("[data-del]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const id = btn.getAttribute("data-del");
+        const confirmed = await modalDanger("Atenção", `Excluir treino ${id}?`);
+        if(!confirmed) return;
+        workouts = workouts.filter(w=>w.id!==id);
+        // opcional: apagar feedback desse treino também
+        feedback = feedback.filter(f=>f.workoutId!==id);
+        save(KEY.workouts, workouts);
+        save(KEY.feedback, feedback);
+        renderWorkouts();
+        refreshStudentUI();
+        refreshDataUI();
+        updateStorageInfo();
+      });
+    });
+  }
+
+  // ===== Student UI =====
+  const alunoTreinoId = $("#alunoTreinoId");
+  const alunoNome = $("#alunoNome");
+  const alunoStatus = $("#alunoStatus");
+  const alunoMotivo = $("#alunoMotivo");
+  const alunoDor = $("#alunoDor");
+  const alunoRpe = $("#alunoRpe");
+  const alunoComentario = $("#alunoComentario");
+  const btnEnviarRetorno = $("#btnEnviarRetorno");
+  const previewTreinoAluno = $("#previewTreinoAluno");
+  const listaRetornos = $("#listaRetornos");
+
+  function refreshStudentUI(){
+    // populate workout dropdown
+    alunoTreinoId.innerHTML = workouts.length
+      ? workouts.map(w=>`<option value="${escapeHtml(w.id)}">${escapeHtml(w.id)} • ${escapeHtml(w.student)} • ${escapeHtml(w.date)}</option>`).join("")
+      : `<option value="">(Nenhum treino)</option>`;
+
+    if(workouts.length){
+      if(!alunoTreinoId.value) alunoTreinoId.value = workouts[0].id;
+      renderWorkoutPreviewForStudent();
+    }else{
+      previewTreinoAluno.textContent = "Crie um treino na aba Treinador para aparecer aqui.";
+    }
+
+    renderFeedbackList();
+    updateStorageInfo();
+  }
+
+  function renderWorkoutPreviewForStudent(){
+    const id = alunoTreinoId.value;
+    const w = workouts.find(x=>x.id===id);
+    if(!w){ previewTreinoAluno.textContent = "Selecione um TreinoID válido."; return; }
+
+    const totalMin = w.items.reduce((a,b)=>a+(Number(b.min)||0),0);
+    const cats = [...new Set(w.items.map(i=>i.categoria))];
+
+    previewTreinoAluno.innerHTML = `
+      <div class="item">
+        <div class="itemTop">
+          <div>
+            <div class="itemTitle">${escapeHtml(w.id)}</div>
+            <div class="muted">${escapeHtml(w.student)} • ${escapeHtml(w.date)} • Objetivo: ${escapeHtml(w.goal)}</div>
+          </div>
+          <div class="mono small">${w.items.length} itens • ${totalMin} min</div>
+        </div>
+        <div class="chips">
+          ${cats.slice(0,6).map(c=>`<span class="chip gray">${escapeHtml(c)}</span>`).join("") || `<span class="chip gray">Sem itens</span>`}
+        </div>
+        <div class="hr"></div>
+        ${w.items.length ? w.items.map(i => `
+          <div class="muted" style="margin-bottom:8px">
+            <b>${escapeHtml(i.bloco)}</b> • ${escapeHtml(i.categoria)}<br/>
+            ${escapeHtml(i.exercicio)} <span class="mono">(${escapeHtml(i.metrica)}: ${escapeHtml(i.quantidade)} • ${escapeHtml(i.intensTipo)} ${escapeHtml(i.intensVal || "")} • ${escapeHtml(i.min)}min)</span>
+            ${i.notas ? `<div class="muted">Notas: ${escapeHtml(i.notas)}</div>` : ""}
+          </div>
+        `).join("") : `<div class="muted">O treinador ainda não adicionou itens.</div>`}
+      </div>
+    `;
+  }
+
+  alunoTreinoId.addEventListener("change", renderWorkoutPreviewForStudent);
+
+  btnEnviarRetorno.addEventListener("click", async ()=>{
+    const workoutId = alunoTreinoId.value;
+    if(!workoutId){ await modalAlert("Atenção", "Selecione um TreinoID."); return; }
+
+    const studentName = alunoNome.value.trim();
+    if(!studentName){ await modalAlert("Atenção", "Preencha seu nome (ou ID)."); return; }
+
+    const status = alunoStatus.value;
+    const reason = alunoMotivo.value;
+    const fingerPain = Math.max(0, Math.min(10, Number(alunoDor.value)));
+    const rpe = Math.max(1, Math.min(10, Number(alunoRpe.value)));
+    const comment = alunoComentario.value.trim();
+
+    const f = {
+      id: uid("fb"),
+      workoutId,
+      studentName,
+      status,
+      reason,
+      fingerPain,
+      rpe,
+      comment,
+      ts: nowISO()
+    };
+
+    feedback.unshift(f);
+    save(KEY.feedback, feedback);
+
+    alunoComentario.value = "";
+    renderFeedbackList();
+    refreshDataUI();
+    updateStorageInfo();
+    await modalAlert("Sucesso", "Retorno enviado!");
+  });
+
+  function renderFeedbackList(){
+    if(feedback.length === 0){
+      listaRetornos.innerHTML = `<div class="muted">Nenhum retorno ainda.</div>`;
+      return;
+    }
+    listaRetornos.innerHTML = feedback.slice(0,50).map(f => `
+      <div class="item">
+        <div class="itemTop">
+          <div>
+            <div class="itemTitle">${escapeHtml(f.workoutId)}</div>
+            <div class="muted">${escapeHtml(f.studentName)} • ${new Date(f.ts).toLocaleString()}</div>
+          </div>
+          ${badgeForStatus(f.status)}
+        </div>
+        <div class="chips" style="margin-top:10px">
+          <span class="chip gray">Dor dedo: <b>${escapeHtml(f.fingerPain)}</b>/10</span>
+          <span class="chip gray">RPE: <b>${escapeHtml(f.rpe)}</b>/10</span>
+          ${f.reason ? `<span class="chip gray">Motivo: <b>${escapeHtml(f.reason)}</b></span>` : ""}
+        </div>
+        ${f.comment ? `<div class="hr"></div><div class="muted">${escapeHtml(f.comment)}</div>` : ""}
+        <div class="btnbar" style="margin-top:10px">
+          <button class="danger" data-del-fb="${escapeHtml(f.id)}">Excluir retorno</button>
+        </div>
+      </div>
+    `).join("");
+
+    listaRetornos.querySelectorAll("[data-del-fb]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const id = btn.getAttribute("data-del-fb");
+        const confirmed = await modalConfirm("Atenção", "Excluir este retorno?");
+        if(!confirmed) return;
+        feedback = feedback.filter(x=>x.id!==id);
+        save(KEY.feedback, feedback);
+        renderFeedbackList();
+        refreshDataUI();
+        updateStorageInfo();
+      });
+    });
+  }
+
+  // ===== Data tab =====
+  const btnExportJSON = $("#btnExportJSON");
+  const btnExportCSV = $("#btnExportCSV");
+  const btnExportTSV = $("#btnExportTSV");
+  const btnImport = $("#btnImport");
+  const exportArea = $("#exportArea");
+  const miniMetricas = $("#miniMetricas");
+
+  // Gerar CSV com treinos e retornos
+  function generateCSV(){
+    let csv = "TREINOS\n";
+    csv += "ID,Data,Aluno,Objetivo,Itens\n";
+    workouts.forEach(w=>{
+      csv += `"${w.id}","${w.date}","${w.student}","${w.goal}",${w.items.length}\n`;
+    });
+    
+    csv += "\n\nITENS DOS TREINOS\n";
+    csv += "TreinoID,Bloco,Categoria,Exercício,Métrica,Quantidade,Intensidade,Min,Notas\n";
+    workouts.forEach(w=>{
+      w.items.forEach(it=>{
+        csv += `"${w.id}","${it.bloco}","${it.categoria}","${it.exercicio}","${it.metrica}",${it.quantidade},"${it.intensTipo} ${it.intensVal}",${it.min},"${it.notas}"\n`;
+      });
+    });
+    
+    csv += "\n\nRETORNOS DOS ALUNOS\n";
+    csv += "TreinoID,Aluno,Status,Motivo,DorDedo,RPE,Comentário,Data\n";
+    feedback.forEach(f=>{
+      csv += `"${f.workoutId}","${f.studentName}","${f.status}","${f.reason}",${f.fingerPain},${f.rpe},"${f.comment}","${new Date(f.ts).toLocaleString()}"\n`;
+    });
+    
+    return csv;
+  }
+
+  // Gerar TSV (Tab-Separated Values) - funciona melhor com Google Sheets
+  function generateTSV(){
+    let tsv = "TREINOS\n";
+    tsv += "ID\tData\tAluno\tObjetivo\tItens\n";
+    workouts.forEach(w=>{
+      tsv += `${w.id}\t${w.date}\t${w.student}\t${w.goal}\t${w.items.length}\n`;
+    });
+    
+    tsv += "\n\nITENS DOS TREINOS\n";
+    tsv += "TreinoID\tBloco\tCategoria\tExercício\tMétrica\tQuantidade\tIntensidade\tMin\tNotas\n";
+    workouts.forEach(w=>{
+      w.items.forEach(it=>{
+        tsv += `${w.id}\t${it.bloco}\t${it.categoria}\t${it.exercicio}\t${it.metrica}\t${it.quantidade}\t${it.intensTipo} ${it.intensVal}\t${it.min}\t${it.notas}\n`;
+      });
+    });
+    
+    tsv += "\n\nRETORNOS DOS ALUNOS\n";
+    tsv += "TreinoID\tAluno\tStatus\tMotivo\tDorDedo\tRPE\tComentário\tData\n";
+    feedback.forEach(f=>{
+      tsv += `${f.workoutId}\t${f.studentName}\t${f.status}\t${f.reason}\t${f.fingerPain}\t${f.rpe}\t${f.comment}\t${new Date(f.ts).toLocaleString()}\n`;
+    });
+    
+    return tsv;
+  }
+
+  btnExportJSON.addEventListener("click", async ()=>{
+    refreshDataUI();
+    await modalAlert("Sucesso", "✓ JSON gerado! Copie o conteúdo abaixo.");
+  });
+
+  btnExportCSV.addEventListener("click", async ()=>{
+    const csv = generateCSV();
+    exportArea.value = csv;
+    try{
+      await navigator.clipboard.writeText(csv);
+      await modalAlert("Sucesso", "✓ CSV copiado para clipboard!\n\nAbra Google Sheets e cole-o.");
+    }catch{
+      await modalAlert("Sucesso", "✓ CSV gerado! Copie manualmente o conteúdo abaixo.");
+    }
+  });
+
+  btnExportTSV.addEventListener("click", async ()=>{
+    const tsv = generateTSV();
+    exportArea.value = tsv;
+    try{
+      await navigator.clipboard.writeText(tsv);
+      await modalAlert("Sucesso", "✓ TSV copiado!\n\nAbra Google Sheets e pressione Ctrl+V para colar direto.");
+    }catch{
+      await modalAlert("Sucesso", "✓ TSV gerado! Copie manualmente o conteúdo abaixo.");
+    }
+  });
+
+  btnImport.addEventListener("click", async ()=>{
+    const json = exportArea.value.trim();
+    if(!json){ await modalAlert("Aviso", "Cole um JSON válido na caixa acima."); return; }
+    
+    try{
+      const payload = JSON.parse(json);
+      if(!Array.isArray(payload.workouts) || !Array.isArray(payload.feedback)){
+        await modalAlert("Erro", "JSON inválido: faltam campos 'workouts' ou 'feedback'.");
+        return;
+      }
+      
+      const confirmed = await modalConfirm(
+        "Restaurar dados",
+        `Restaurar ${payload.workouts.length} treinos e ${payload.feedback.length} retornos?\n\nIsso sobrescreverá os dados atuais!`
+      );
+      if(!confirmed) return;
+      
+      workouts = payload.workouts;
+      feedback = payload.feedback;
+      save(KEY.workouts, workouts);
+      save(KEY.feedback, feedback);
+      
+      renderWorkouts();
+      refreshStudentUI();
+      refreshDataUI();
+      updateStorageInfo();
+      await modalAlert("Sucesso", "✓ Dados restaurados com sucesso!");
+    }catch(e){
+      await modalAlert("Erro", `Erro ao importar JSON: ${e.message}`);
+    }
+  });
+
+  // ===== Auto-Sync & Integrações =====
+  const syncStatus = $("#syncStatus");
+  const githubToken = $("#githubToken");
+  const gistId = $("#gistId");
+  const backendUrl = $("#backendUrl");
+  const backendToken = $("#backendToken");
+  const autoSyncToggle = $("#autoSyncToggle");
+  const autoSyncInterval = $("#autoSyncInterval");
+  const btnSyncGithub = $("#btnSyncGithub");
+  const btnLoadGithub = $("#btnLoadGithub");
+  const btnSyncBackend = $("#btnSyncBackend");
+  const btnLoadBackend = $("#btnLoadBackend");
+  const btnTestSync = $("#btnTestSync");
+  const btnSaveConfig = $("#btnSaveConfig");
+
+  const CONFIG_KEY = "mvp_integrations_v1";
+  let autoSyncTimer = null;
+
+  function loadIntegrationConfig(){
+    try{
+      const config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || {};
+      githubToken.value = config.githubToken || "";
+      gistId.value = config.gistId || "";
+      backendUrl.value = config.backendUrl || "";
+      backendToken.value = config.backendToken || "";
+      autoSyncToggle.checked = config.autoSyncEnabled || false;
+      autoSyncInterval.value = config.autoSyncInterval || 60;
+    }catch(e){
+      console.warn("Erro ao carregar config", e);
+    }
+  }
+
+  function saveIntegrationConfig(){
+    const config = {
+      githubToken: githubToken.value,
+      gistId: gistId.value,
+      backendUrl: backendUrl.value,
+      backendToken: backendToken.value,
+      autoSyncEnabled: autoSyncToggle.checked,
+      autoSyncInterval: Number(autoSyncInterval.value)
+    };
+    localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+  }
+
+  function updateSyncStatus(status, type = "success"){
+    const colors = {
+      success: "rgba(34,197,94,.15); color:#bff7d0; border-color:rgba(34,197,94,.3)",
+      error: "rgba(239,68,68,.15); color:#ffd0d0; border-color:rgba(239,68,68,.3)",
+      syncing: "rgba(245,158,11,.15); color:#ffe1b1; border-color:rgba(245,158,11,.3)"
+    };
+    syncStatus.style.background = colors[type].split(";")[0];
+    syncStatus.style.color = colors[type].split(";")[1];
+    syncStatus.style.borderColor = colors[type].split(";")[2];
+    syncStatus.textContent = status;
+  }
+
+  // GitHub Gist API
+  async function pushToGithub(){
+    const token = githubToken.value.trim();
+    if(!token){ await modalAlert("Config", "Preencha seu GitHub token."); return; }
+
+    const payload = {
+      version: 1,
+      exportedAt: nowISO(),
+      workouts,
+      feedback
+    };
+
+    updateSyncStatus("Sincronizando...", "syncing");
+
+    try{
+      let method = "POST";
+      let url = "https://api.github.com/gists";
+      let body = {
+        description: "MVP Treino Escalada - Backup (MVP-Escalada)",
+        public: false,
+        files: {
+          "treino-escalada-data.json": {
+            content: JSON.stringify(payload, null, 2)
+          }
+        }
+      };
+
+      if(gistId.value){
+        method = "PATCH";
+        url = `https://api.github.com/gists/${gistId.value}`;
+      }
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Authorization": `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if(!response.ok){
+        throw new Error(`GitHub API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      gistId.value = data.id;
+      saveIntegrationConfig();
+      updateSyncStatus("✓ GitHub OK", "success");
+      await modalAlert("Sucesso", "✓ Dados sincronizados com GitHub Gist!");
+    }catch(e){
+      updateSyncStatus("✗ Erro GitHub", "error");
+      await modalAlert("Erro", `Falha ao sincronizar com GitHub:\n${e.message}`);
+    }
+  }
+
+  async function pullFromGithub(){
+    const token = githubToken.value.trim();
+    const id = gistId.value.trim();
+    
+    if(!token || !id){ 
+      await modalAlert("Config", "Preencha GitHub token e Gist ID."); 
+      return; 
+    }
+
+    updateSyncStatus("Carregando...", "syncing");
+
+    try{
+      const response = await fetch(`https://api.github.com/gists/${id}`, {
+        headers: { "Authorization": `token ${token}` }
+      });
+
+      if(!response.ok) throw new Error(`GitHub error: ${response.status}`);
+
+      const data = await response.json();
+      const fileContent = data.files["treino-escalada-data.json"].content;
+      const payload = JSON.parse(fileContent);
+
+      const confirmed = await modalConfirm(
+        "Carregar do GitHub",
+        `Vai carregar ${payload.workouts.length} treinos e ${payload.feedback.length} retornos. Continuar?`
+      );
+      if(!confirmed) return;
+
+      workouts = payload.workouts;
+      feedback = payload.feedback;
+      save(KEY.workouts, workouts);
+      save(KEY.feedback, feedback);
+
+      renderWorkouts();
+      refreshStudentUI();
+      refreshDataUI();
+      updateStorageInfo();
+      updateSyncStatus("✓ GitHub OK", "success");
+      await modalAlert("Sucesso", "✓ Dados carregados do GitHub!");
+    }catch(e){
+      updateSyncStatus("✗ Erro GitHub", "error");
+      await modalAlert("Erro", `Falha ao carregar do GitHub:\n${e.message}`);
+    }
+  }
+
+  // Backend API
+  async function pushToBackend(){
+    const url = backendUrl.value.trim();
+    if(!url){ await modalAlert("Config", "Preencha a URL do Backend."); return; }
+
+    const payload = {
+      version: 1,
+      exportedAt: nowISO(),
+      workouts,
+      feedback
+    };
+
+    updateSyncStatus("Sincronizando...", "syncing");
+
+    try{
+      const headers = {
+        "Content-Type": "application/json"
+      };
+      if(backendToken.value) headers["Authorization"] = backendToken.value;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload)
+      });
+
+      if(!response.ok) throw new Error(`Server error: ${response.status}`);
+
+      updateSyncStatus("✓ Backend OK", "success");
+      await modalAlert("Sucesso", "✓ Dados enviados para o Backend!");
+    }catch(e){
+      updateSyncStatus("✗ Erro Backend", "error");
+      await modalAlert("Erro", `Falha ao enviar para Backend:\n${e.message}`);
+    }
+  }
+
+  async function pullFromBackend(){
+    const url = backendUrl.value.trim();
+    if(!url){ await modalAlert("Config", "Preencha a URL do Backend."); return; }
+
+    updateSyncStatus("Carregando...", "syncing");
+
+    try{
+      const headers = {};
+      if(backendToken.value) headers["Authorization"] = backendToken.value;
+
+      const response = await fetch(url, { headers });
+      if(!response.ok) throw new Error(`Server error: ${response.status}`);
+
+      const payload = await response.json();
+      const confirmed = await modalConfirm(
+        "Carregar do Backend",
+        `Vai carregar ${payload.workouts.length} treinos e ${payload.feedback.length} retornos. Continuar?`
+      );
+      if(!confirmed) return;
+
+      workouts = payload.workouts;
+      feedback = payload.feedback;
+      save(KEY.workouts, workouts);
+      save(KEY.feedback, feedback);
+
+      renderWorkouts();
+      refreshStudentUI();
+      refreshDataUI();
+      updateStorageInfo();
+      updateSyncStatus("✓ Backend OK", "success");
+      await modalAlert("Sucesso", "✓ Dados carregados do Backend!");
+    }catch(e){
+      updateSyncStatus("✗ Erro Backend", "error");
+      await modalAlert("Erro", `Falha ao carregar do Backend:\n${e.message}`);
+    }
+  }
+
+  // Event listeners
+  btnSyncGithub.addEventListener("click", pushToGithub);
+  btnLoadGithub.addEventListener("click", pullFromGithub);
+  btnSyncBackend.addEventListener("click", pushToBackend);
+  btnLoadBackend.addEventListener("click", pullFromBackend);
+
+  btnSaveConfig.addEventListener("click", async ()=>{
+    saveIntegrationConfig();
+    await modalAlert("Sucesso", "✓ Configurações salvas!");
+  });
+
+  btnTestSync.addEventListener("click", async ()=>{
+    if(!githubToken.value && !backendUrl.value){
+      await modalAlert("Config", "Configure GitHub ou Backend primeiro.");
+      return;
+    }
+    if(githubToken.value) await pushToGithub();
+    if(backendUrl.value) await pushToBackend();
+  });
+
+  autoSyncToggle.addEventListener("change", ()=>{
+    saveIntegrationConfig();
+    if(autoSyncToggle.checked) startAutoSync();
+    else stopAutoSync();
+  });
+
+  function startAutoSync(){
+    stopAutoSync();
+    const interval = Number(autoSyncInterval.value) * 1000;
+    autoSyncTimer = setInterval(async ()=>{
+      updateSyncStatus("Sincronizando...", "syncing");
+      if(githubToken.value) await pushToGithub();
+      if(backendUrl.value) await pushToBackend();
+    }, interval);
+  }
+
+  function stopAutoSync(){
+    if(autoSyncTimer) clearInterval(autoSyncTimer);
+  }
+
+  // Auto-sync ao fechar a página
+  window.addEventListener("beforeunload", ()=>{
+    if(autoSyncToggle.checked){
+      if(githubToken.value) pushToGithub();
+      if(backendUrl.value) pushToBackend();
+    }
+  });
+
+  // Carregar config ao iniciar
+  loadIntegrationConfig();
+  if(autoSyncToggle.checked) startAutoSync();
+
+  function refreshDataUI(){
+    const payload = {
+      version: 1,
+      exportedAt: nowISO(),
+      workouts,
+      feedback
+    };
+    exportArea.value = JSON.stringify(payload, null, 2);
+
+    // Mini métricas (bem simples)
+    const totalWorkouts = workouts.length;
+    const totalItems = workouts.reduce((a,w)=>a+w.items.length,0);
+    const avgItems = totalWorkouts ? (totalItems/totalWorkouts).toFixed(1) : "0";
+    const avgPain = feedback.length ? (feedback.reduce((a,f)=>a+(Number(f.fingerPain)||0),0)/feedback.length).toFixed(2) : "0";
+    const compl = feedback.filter(f=>f.status==="Concluído").length;
+    const partial = feedback.filter(f=>f.status==="Parcial").length;
+    const no = feedback.filter(f=>f.status==="Não fez").length;
+
+    // Top categorias por contagem de itens
+    const catCount = new Map();
+    for(const w of workouts){
+      for(const it of w.items){
+        catCount.set(it.categoria, (catCount.get(it.categoria)||0) + 1);
+      }
+    }
+    const topCats = [...catCount.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);
+
+    const timeByCategory = new Map();
+    for(const w of workouts){
+      for(const it of w.items){
+        const minutes = Number(it.min) || 0;
+        timeByCategory.set(it.categoria, (timeByCategory.get(it.categoria)||0) + minutes);
+      }
+    }
+    const topTimeByCategory = [...timeByCategory.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);
+
+    const blocoCount = new Map();
+    for(const w of workouts){
+      for(const it of w.items){
+        blocoCount.set(it.bloco, (blocoCount.get(it.bloco)||0) + 1);
+      }
+    }
+    const topBlocos = [...blocoCount.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+    const rpeByStatus = {"Concluído": [], "Parcial": [], "Não fez": []};
+    const painByStatus = {"Concluído": [], "Parcial": [], "Não fez": []};
+    for(const f of feedback){
+      if(rpeByStatus[f.status]) rpeByStatus[f.status].push(Number(f.rpe)||0);
+      if(painByStatus[f.status]) painByStatus[f.status].push(Number(f.fingerPain)||0);
+    }
+    const getRpeAvg = (status) => rpeByStatus[status].length ? (rpeByStatus[status].reduce((a,b)=>a+b,0)/rpeByStatus[status].length).toFixed(1) : "—";
+    const getPainAvg = (status) => painByStatus[status].length ? (painByStatus[status].reduce((a,b)=>a+b,0)/painByStatus[status].length).toFixed(1) : "—";
+
+    miniMetricas.innerHTML = `
+      <div class="item">
+        <div class="itemTitle">📊 Resumo geral</div>
+        <div class="chips" style="margin-top:10px">
+          <span class="chip gray">Treinos: <b>${totalWorkouts}</b></span>
+          <span class="chip gray">Itens: <b>${totalItems}</b></span>
+          <span class="chip gray">Média: <b>${avgItems}</b> itens/treino</span>
+          <span class="chip gray">Dor dedo: <b>${avgPain}</b>/10 (média)</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="itemTitle">📈 Status dos retornos</div>
+        <div class="chips" style="margin-top:10px">
+          <span class="chip" style="border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.10)">Concluído: <b>${compl}</b> | RPE: ${getRpeAvg("Concluído")} | Dor: ${getPainAvg("Concluído")}</span>
+          <span class="chip" style="border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.10)">Parcial: <b>${partial}</b> | RPE: ${getRpeAvg("Parcial")} | Dor: ${getPainAvg("Parcial")}</span>
+          <span class="chip" style="border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.10)">Não fez: <b>${no}</b> | RPE: ${getRpeAvg("Não fez")} | Dor: ${getPainAvg("Não fez")}</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="itemTitle">⏱️ Tempo planejado por categoria</div>
+        <div class="muted" style="margin-top:6px">Análise de distribuição de volume de treino.</div>
+        <div class="hr"></div>
+        ${topTimeByCategory.length ? topTimeByCategory.map(([c,min])=>`
+          <div class="muted" style="margin-bottom:8px">
+            <span class="chip gray">${escapeHtml(c)}</span> <span class="mono" style="font-weight:bold">${min} min</span>
+            <span class="muted" style="font-size:11px"> (${((min / (topTimeByCategory.reduce((a,b)=>a+b[1],0)) * 100) || 0).toFixed(0)}%)</span>
+          </div>
+        `).join("") : `<div class="muted">Sem dados de tempo.</div>`}
+      </div>
+
+      <div class="item">
+        <div class="itemTitle">🎯 Blocos mais usados</div>
+        <div class="muted" style="margin-top:6px">Frequência de blocos planejados.</div>
+        <div class="hr"></div>
+        ${topBlocos.length ? topBlocos.map(([b,count])=>`
+          <div class="muted" style="margin-bottom:6px">
+            <span class="chip gray">${escapeHtml(b)}</span> <span class="mono">${count} itens</span>
+          </div>
+        `).join("") : `<div class="muted">Sem dados de blocos.</div>`}
+      </div>
+
+      <div class="item">
+        <div class="itemTitle">📋 Top categorias (por frequência)</div>
+        <div class="muted" style="margin-top:6px">Modelo permite análise de composição de treino.</div>
+        <div class="hr"></div>
+        ${topCats.length ? topCats.map(([c,n])=>`
+          <div class="muted" style="margin-bottom:6px">
+            <span class="chip gray">${escapeHtml(c)}</span> <span class="mono">${n} itens</span>
+            <span class="muted" style="font-size:11px"> (${((n / totalItems * 100) || 0).toFixed(0)}% do total)</span>
+          </div>
+        `).join("") : `<div class="muted">Sem dados de categorias.</div>`}
+      </div>
+    `;
+  }
+function enhanceAllSelectsToCustomDropdown() {
+  const selects = Array.from(document.querySelectorAll("select"))
+    .filter(sel => sel.getAttribute("data-native") !== "true");
+
+  for (const sel of selects) {
+    // Evita duplicar se já foi convertido
+    if (sel.dataset.cselectEnhanced === "true") continue;
+    sel.dataset.cselectEnhanced = "true";
+
+    // Cria wrapper
+    const wrap = document.createElement("div");
+    wrap.className = "cselect";
+
+    // Insere wrapper no lugar do select e move o select pra dentro
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+
+    // Esconde o select nativo (mantém acessibilidade/valor)
+    sel.classList.add("native-hidden");
+
+    // Botão
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "cselect-btn";
+    btn.setAttribute("aria-haspopup", "listbox");
+    btn.setAttribute("aria-expanded", "false");
+
+    const label = document.createElement("span");
+    label.className = "cselect-label";
+
+    const caret = document.createElement("span");
+    caret.className = "cselect-caret";
+    caret.textContent = "▾";
+
+    btn.appendChild(label);
+    btn.appendChild(caret);
+
+    // Menu
+    const menu = document.createElement("div");
+    menu.className = "cselect-menu hidden";
+    menu.setAttribute("role", "listbox");
+
+    // Busca (opcional, mas ajuda muito em celular)
+    const searchWrap = document.createElement("div");
+    searchWrap.className = "cselect-search";
+    const search = document.createElement("input");
+    search.type = "text";
+    search.placeholder = "Buscar...";
+    search.setAttribute("aria-label", "Buscar opção");
+    searchWrap.appendChild(search);
+    menu.appendChild(searchWrap);
+
+    // Itens
+    const itemsContainer = document.createElement("div");
+    menu.appendChild(itemsContainer);
+
+    function buildItems(filterText = "") {
+      itemsContainer.innerHTML = "";
+      const ft = filterText.trim().toLowerCase();
+
+      const opts = Array.from(sel.options);
+      for (let i = 0; i < opts.length; i++) {
+        const opt = opts[i];
+        const text = (opt.textContent || "").trim();
+        const val = opt.value;
+
+        if (ft && !text.toLowerCase().includes(ft)) continue;
+
+        const item = document.createElement("div");
+        item.className = "cselect-item";
+        item.setAttribute("role", "option");
+        item.dataset.value = val;
+        item.textContent = text || "(sem texto)";
+
+        const isSelected = sel.value === val;
+        item.setAttribute("aria-selected", isSelected ? "true" : "false");
+
+        if (opt.disabled) {
+          item.style.opacity = "0.45";
+          item.style.pointerEvents = "none";
+        }
+
+        item.addEventListener("click", () => {
+          setValue(val);
+          close();
+          btn.focus();
+        });
+
+        itemsContainer.appendChild(item);
+      }
+
+      if (!itemsContainer.children.length) {
+        const empty = document.createElement("div");
+        empty.className = "cselect-item cselect-muted";
+        empty.textContent = "Nenhum resultado";
+        empty.style.pointerEvents = "none";
+        itemsContainer.appendChild(empty);
+      }
+    }
+
+    function syncLabel() {
+      // leitura defensiva do valor/option
+      var current = '';
+      try {
+        if (sel.selectedIndex >= 0 && sel.options[sel.selectedIndex]) {
+          current = (sel.options[sel.selectedIndex].textContent || '').trim();
+        } else {
+          var v = (typeof sel.value !== 'undefined') ? String(sel.value) : null;
+          if (v !== null) {
+            for (var i = 0; i < sel.options.length; i++) {
+              if (String(sel.options[i].value) === v) { current = (sel.options[i].textContent || '').trim(); break; }
+            }
+          }
+        }
+      } catch (err) {
+        current = '';
+      }
+      label.textContent = current || "Selecionar…";
+    }
+
+    function setValue(val) {
+      sel.value = val;
+      // dispara change para seu JS atual continuar funcionando
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+      // atualiza seleção visual
+      Array.from(itemsContainer.querySelectorAll(".cselect-item[role='option']")).forEach(it => {
+        it.setAttribute("aria-selected", it.dataset.value === val ? "true" : "false");
+      });
+      syncLabel();
+    }
+
+    function open() {
+      menu.classList.remove("hidden");
+      btn.setAttribute("aria-expanded", "true");
+      buildItems(search.value);
+      // foca na busca para facilitar mobile
+      setTimeout(() => search.focus(), 0);
+    }
+
+    function close() {
+      menu.classList.add("hidden");
+      btn.setAttribute("aria-expanded", "false");
+      search.value = "";
+    }
+
+    function toggle() {
+      if (menu.classList.contains("hidden")) open();
+      else close();
+    }
+
+    // Render inicial
+    syncLabel();
+    buildItems("");
+
+    // Eventos
+    btn.addEventListener("click", toggle);
+
+    search.addEventListener("input", () => buildItems(search.value));
+
+    // Teclado básico: Enter/Espaço abre; Esc fecha; setas navegam
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open();
+      }
+    });
+
+    menu.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        close();
+        btn.focus();
+      }
+    });
+
+    // Fecha clicando fora
+    document.addEventListener("click", (e) => {
+      if (!wrap.contains(e.target)) close();
+    });
+
+    // Se o select mudar por código (ex.: você setar value), atualiza label
+    sel.addEventListener("change", () => {
+      syncLabel();
+      // se o menu estiver aberto, atualiza seleção
+      if (!menu.classList.contains("hidden")) buildItems(search.value);
+    });
+
+    // Observer opcional: detecta mudanças por frameworks ou manipulações que não disparam change
+    if (window.MutationObserver && !sel.__cselectObserver) {
+      try {
+        var mo = new MutationObserver(function(muts) {
+          muts.forEach(function(m) {
+            if (m.type === 'attributes' && (m.attributeName === 'value' || m.attributeName === 'selected')) {
+              // força listener existente
+              sel.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            if (m.type === 'childList') {
+              // options re-renderizadas: rebuild e sync
+              if (typeof buildItems === 'function') buildItems(search.value);
+              sel.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          });
+        });
+        mo.observe(sel, { attributes: true, attributeFilter: ['value','selected'], childList: true });
+        sel.__cselectObserver = mo;
+      } catch(e){ /* silencioso */ }
+    }
+
+    // Monta estrutura final
+    wrap.appendChild(btn);
+    wrap.appendChild(menu);
+  }
+}
+
+  // --- ADICIONADO: helper para forçar set via código e disparar eventos ---
+  function setSelectValue(sel, value) {
+    try {
+      if (!sel) return false;
+      // se já for o mesmo valor, ainda forçamos dispatch para sync
+      if (String(sel.value) === String(value)) {
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+        sel.dispatchEvent(new CustomEvent('custom-select-synced', { detail: { value: sel.value }, bubbles: true }));
+        return true;
+      }
+      sel.value = value;
+      // dispara change para os listeners locais (syncLabel/buildItems)
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+      // evento custom para hooks externos
+      sel.dispatchEvent(new CustomEvent('custom-select-synced', { detail: { value: sel.value }, bubbles: true }));
+      return true;
+    } catch (err) {
+      console.error('setSelectValue', err);
+      return false;
+    }
+  }
+
+  // Inicializa controles da aba de avaliação
+  function initEvaluationControls(){
+    try{
+      const btnSet = $("#evalSetValue");
+      const btnOpen = $("#evalOpenMenu");
+      const btnRun = $("#evalRun");
+      const selInput = $("#evalSelector");
+      const valInput = $("#evalValue");
+      const log = $("#evalLog");
+      if(tabEval) tabEval.addEventListener('click', ()=>setTab('eval'));
+
+      function logf(m){ if(log) log.textContent = new Date().toISOString() + ' - ' + m + '\n' + log.textContent; }
+
+      if(btnSet) btnSet.addEventListener('click', ()=>{
+        const sel = document.querySelector(selInput.value || 'select');
+        const ok = setSelectValue(sel, valInput.value);
+        logf('setSelectValue -> ' + ok + ' (' + valInput.value + ')');
+      });
+
+      if(btnOpen) btnOpen.addEventListener('click', ()=>{
+        const sel = document.querySelector(selInput.value || 'select');
+        if(!sel) { logf('select não encontrado'); return; }
+        const wrap = sel.closest && sel.closest('.cselect');
+        if(wrap){ wrap.querySelector('.cselect-menu')?.classList.remove('hidden'); wrap.querySelector('.cselect-btn')?.setAttribute('aria-expanded','true'); if(typeof buildItems==='function') buildItems(sel); logf('menu aberto'); }
+      });
+
+      if(btnRun) btnRun.addEventListener('click', ()=>{
+        const sel = document.querySelector(selInput.value || 'select');
+        if(!sel){ logf('select não encontrado'); return; }
+        const original = sel.value;
+        // simular user-change
+        const opt = sel.querySelector('option:nth-child(2)');
+        if(opt){ opt.selected = true; sel.dispatchEvent(new Event('change',{bubbles:true})); logf('simulated user change -> '+sel.value); }
+        // mudança por código
+        setSelectValue(sel, opt? opt.value : original);
+        logf('code set -> '+sel.value);
+        // restore
+        setSelectValue(sel, original);
+        logf('restored -> '+sel.value);
+      });
+    }catch(e){ console.error('initEvaluationControls', e); }
+  }
+
+  // ===== Avaliação: armazenamento e cálculos =====
+  const EVAL_KEY = 'EVAL_SESSIONS_V1';
+
+  function computeEvalMetrics(s){
+    const duration = Number(s.durationMin) || 0;
+    const RPE = Number(s.RPE) || 0;
+    const attempts = Number(s.attempts) || 0;
+    const successes = Number(s.successes) || 0;
+    const tech = Number(s.techRating) || 0;
+    const focus = Number(s.focus) || 0;
+    const confidence = Number(s.confidence) || 0;
+    const stress = Number(s.stress) || 0;
+    const motivation = Number(s.motivation) || 0;
+
+    const physicalLoad = duration * (1 + RPE/10);
+    const successRate = attempts ? (successes / attempts) : (attempts===0 && successes>0 ? 1 : 0);
+    const techScore = Math.round(100 * ( (successRate * 0.7) + ( (tech/10) * 0.3) ));
+    const mentalScore = Math.round(((focus + confidence + motivation)/30) * 100 * (1 - stress/30));
+    const sessionVolume = physicalLoad + (techScore * 0.2) + (mentalScore * 0.1);
+
+    return { physicalLoad, techScore, mentalScore, sessionVolume };
+  }
+
+  function loadEvalSessions(){
+    try{ return JSON.parse(localStorage.getItem(EVAL_KEY)) || []; }catch(e){ return []; }
+  }
+
+  function saveEvalSessions(list){
+    localStorage.setItem(EVAL_KEY, JSON.stringify(list));
+  }
+
+  function renderEvalList(){
+    const list = loadEvalSessions();
+    const container = $('#evalSessionsList');
+    const summary = $('#evalSummary');
+    const last = $('#evalLast');
+    if(!container) return;
+    if(list.length===0){ container.innerHTML = '<div class="muted">Nenhuma sessão.</div>'; if(summary) summary.textContent='—'; if(last) last.textContent='—'; return; }
+
+    container.innerHTML = list.map(s=>{
+      return `<div class="item"><div class="itemTop"><div><div class="itemTitle">${escapeHtml(s.date)} • ${escapeHtml(s.type)}</div><div class="muted">Vol:${Math.round(s.sessionVolume)} • Phys:${Math.round(s.physicalLoad)} • Tech:${s.techScore} • Mental:${s.mentalScore}</div></div><div class="mono small">${escapeHtml(s.notes || '')}</div></div></div>`;
+    }).join('');
+
+    // summary: totals and weekly volume
+    const totalVol = list.reduce((a,b)=>a+Number(b.sessionVolume||0),0);
+    if(summary) summary.textContent = `Total sessões: ${list.length} • Volume total: ${Math.round(totalVol)}`;
+    if(last){ const s = list[0]; last.textContent = `${s.date} • Vol ${Math.round(s.sessionVolume)} • RPE ${s.RPE}`; }
+
+    renderWeekly(list);
+  }
+
+  function renderWeekly(list){
+    const byDay = {};
+    for(const s of list){ const d = s.date || new Date().toISOString().slice(0,10); byDay[d] = (byDay[d]||0) + Number(s.sessionVolume||0); }
+    const days = Object.keys(byDay).sort().slice(-14); // últimas 14
+    const el = $('#evalWeekly');
+    if(!el) return;
+    // simple sparkline using inline bars
+    el.innerHTML = days.map(d=>`<div style="display:inline-block;width:18px;height:24px;margin-right:4px;background:linear-gradient(180deg,#6ee7ff,#22c55e);opacity:0.85;vertical-align:bottom;transform-origin:bottom;">` +
+      `<div style=\"height:${Math.min(100,Math.round(byDay[d]))}%;width:100%\"></div></div>`).join('');
+  }
+
+  function evalFromForm(){
+    return {
+      id: 'eval_' + Math.random().toString(16).slice(2) + '_' + Date.now().toString(16),
+      date: ($('#evalDate')?.value) || new Date().toISOString().slice(0,10),
+      type: $('#evalType')?.value || 'Mista',
+      durationMin: Number($('#evalDuration')?.value) || 0,
+      attempts: Number($('#evalAttempts')?.value) || 0,
+      successes: Number($('#evalSuccesses')?.value) || 0,
+      errors: Number($('#evalErrors')?.value) || 0,
+      RPE: Number($('#evalRpe')?.value) || 0,
+      techRating: Number($('#evalTech')?.value) || 0,
+      focus: Number($('#evalFocus')?.value) || 0,
+      confidence: Number($('#evalConfidence')?.value) || 0,
+      stress: Number($('#evalStress')?.value) || 0,
+      motivation: Number($('#evalMotivation')?.value) || 0,
+      notes: $('#evalNotes')?.value || ''
+    };
+  }
+
+  function saveEvalSession(){
+    const s = evalFromForm();
+    const metrics = computeEvalMetrics({ durationMin: s.durationMin, RPE: s.RPE, attempts: s.attempts, successes: s.successes, techRating: s.techRating, focus: s.focus, confidence: s.confidence, stress: s.stress, motivation: s.motivation });
+    Object.assign(s, metrics);
+    const list = loadEvalSessions();
+    list.unshift(s);
+    saveEvalSessions(list);
+    renderEvalList();
+  }
+
+  function exportEvalCSV(){
+    const list = loadEvalSessions();
+    const hdr = 'date,type,durationMin,attempts,successes,errors,RPE,techRating,focus,confidence,stress,motivation,physicalLoad,techScore,mentalScore,sessionVolume,notes\n';
+    const rows = list.map(s=>[
+      s.date, s.type, s.durationMin, s.attempts, s.successes, s.errors, s.RPE, s.techRating, s.focus, s.confidence, s.stress, s.motivation, Math.round(s.physicalLoad), s.techScore, s.mentalScore, Math.round(s.sessionVolume), '"'+(s.notes||'')+'"'
+    ].join(','));
+    const csv = hdr + rows.join('\n');
+    const area = $('#exportArea');
+    if(area) area.value = csv;
+    try{ navigator.clipboard.writeText(csv); alert('CSV copiado para clipboard'); }catch(e){ alert('CSV gerado'); }
+  }
+
+  function importEvalCSV(){
+    const area = $('#exportArea');
+    if(!area || !area.value) { alert('Cole CSV no campo Export/Import'); return; }
+    const lines = area.value.trim().split(/\r?\n/).slice(1);
+    const list = [];
+    for(const ln of lines){ const cols = ln.split(','); if(cols.length<5) continue; const s = { date: cols[0], type: cols[1], durationMin: Number(cols[2]||0), attempts: Number(cols[3]||0), successes: Number(cols[4]||0), notes: cols.slice(16).join(',') }; const metrics = computeEvalMetrics(s); Object.assign(s, metrics); list.push(s); }
+    const existing = loadEvalSessions(); saveEvalSessions(list.concat(existing)); renderEvalList();
+  }
+
+  function quickAddEval(){
+    $('#evalDuration').value = 15; $('#evalRpe').value = 6; $('#evalAttempts').value = 5; $('#evalSuccesses').value = 3; $('#evalTech').value = 6; $('#evalFocus').value = 7; $('#evalConfidence').value = 6; $('#evalStress').value = 3; $('#evalMotivation').value = 7;
+    saveEvalSession();
+  }
+
+  // hook into controls
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const btnSave = $('#evalSave'); if(btnSave) btnSave.addEventListener('click', saveEvalSession);
+    const btnExport = $('#evalExport'); if(btnExport) btnExport.addEventListener('click', exportEvalCSV);
+    const btnImport = $('#evalImport'); if(btnImport) btnImport.addEventListener('click', importEvalCSV);
+    const btnQuick = $('#evalQuick'); if(btnQuick) btnQuick.addEventListener('click', quickAddEval);
+    // set default date
+    if($('#evalDate') && !$('#evalDate').value) $('#evalDate').value = new Date().toISOString().slice(0,10);
+    renderEvalList();
+  });
+
+  // ===== Init =====
+  updateStorageInfo();
+  renderWorkouts();
+  refreshStudentUI();
+  refreshDataUI();
+  enhanceAllSelectsToCustomDropdown();
+  initEvaluationControls();
+
+</script>
+</body>
+</html>
