@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GripMetrics</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <span class="logo">⛰️ GripMetrics</span>
+      <span class="tagline">Plataforma de Análise de Performance em Escalada</span>
+    </div>
+  </header>
+
+  <nav class="tab-nav" role="tablist">
+    <button class="tab-btn active" data-tab="trainer" role="tab" aria-selected="true">Treinador</button>
+    <button class="tab-btn" data-tab="athlete" role="tab" aria-selected="false">Aluno</button>
+    <button class="tab-btn" data-tab="evaluation" role="tab" aria-selected="false">Avaliação</button>
+    <button class="tab-btn" data-tab="data" role="tab" aria-selected="false">Dados</button>
+  </nav>
+
+  <main class="app-main">
+
+    <!-- ============================================================
+         TAB: TREINADOR
+    ============================================================ -->
+    <section id="tab-trainer" class="tab-panel active" role="tabpanel">
+      <h2 class="section-title">Criar Treino</h2>
+
+      <form id="form-workout" class="card form-grid" novalidate>
+        <div class="field">
+          <label for="workout-date">Data</label>
+          <input type="date" id="workout-date" required />
+        </div>
+        <div class="field">
+          <label for="workout-athlete">Nome do Aluno</label>
+          <input type="text" id="workout-athlete" placeholder="Ex: João Silva" required />
+        </div>
+        <div class="field field--full">
+          <label for="workout-goal">Objetivo do Dia</label>
+          <input type="text" id="workout-goal" placeholder="Ex: Resistência de força" required />
+        </div>
+      </form>
+
+      <!-- Blocos de exercício -->
+      <div class="section-sub">
+        <h3 class="sub-title">Blocos / Exercícios</h3>
+        <div id="blocks-container" class="blocks-list"></div>
+
+        <div class="card block-editor" id="block-editor">
+          <h4 class="block-editor__title">Novo Bloco</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label for="block-category">Categoria</label>
+              <select id="block-category">
+                <option value="Finger Strength">Finger Strength</option>
+                <option value="Technique">Technique</option>
+                <option value="Power">Power</option>
+                <option value="Endurance">Endurance</option>
+                <option value="Flexibility">Flexibility</option>
+                <option value="Warm-up">Warm-up</option>
+                <option value="Cool-down">Cool-down</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="block-qty">Quantidade</label>
+              <input type="number" id="block-qty" min="1" value="1" />
+            </div>
+            <div class="field">
+              <label for="block-intensity-type">Tipo de Intensidade</label>
+              <select id="block-intensity-type">
+                <option value="RPE">RPE</option>
+                <option value="%">%</option>
+                <option value="Grade">Grade</option>
+                <option value="Peso">Peso</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="block-intensity-value">Valor da Intensidade</label>
+              <input type="text" id="block-intensity-value" placeholder="Ex: 7 / 80% / 6a" />
+            </div>
+            <div class="field">
+              <label for="block-minutes">Minutos Planejados</label>
+              <input type="number" id="block-minutes" min="1" value="10" />
+            </div>
+            <div class="field field--full">
+              <label for="block-notes">Notas do Bloco</label>
+              <input type="text" id="block-notes" placeholder="Observações opcionais" />
+            </div>
+          </div>
+          <button type="button" class="btn btn--secondary" id="btn-add-block">+ Adicionar Bloco</button>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button type="button" class="btn btn--primary" id="btn-save-workout">💾 Salvar Treino</button>
+      </div>
+
+      <!-- Lista de treinos salvos -->
+      <div class="section-sub">
+        <h3 class="sub-title">Treinos Salvos</h3>
+        <div id="saved-workouts-list" class="card-list"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB: ALUNO
+    ============================================================ -->
+    <section id="tab-athlete" class="tab-panel" role="tabpanel" hidden>
+      <h2 class="section-title">Retorno do Aluno</h2>
+
+      <div class="card">
+        <div class="field">
+          <label for="athlete-select-workout">Selecionar Treino</label>
+          <select id="athlete-select-workout">
+            <option value="">-- Selecione um treino --</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="athlete-workout-detail" class="card" hidden>
+        <h3 class="sub-title" id="athlete-workout-title"></h3>
+        <div id="athlete-blocks-list" class="blocks-list blocks-list--readonly"></div>
+      </div>
+
+      <form id="form-feedback" class="card form-grid" novalidate>
+        <div class="field">
+          <label for="feedback-status">Status</label>
+          <select id="feedback-status">
+            <option value="Concluído">Concluído</option>
+            <option value="Parcial">Parcial</option>
+            <option value="Não fez">Não fez</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="feedback-pain">Dor no dedo (0–10)</label>
+          <div class="range-wrap">
+            <input type="range" id="feedback-pain" min="0" max="10" value="0" />
+            <output id="feedback-pain-val">0</output>
+          </div>
+        </div>
+        <div class="field">
+          <label for="feedback-rpe">RPE (1–10)</label>
+          <div class="range-wrap">
+            <input type="range" id="feedback-rpe" min="1" max="10" value="5" />
+            <output id="feedback-rpe-val">5</output>
+          </div>
+        </div>
+        <div class="field field--full">
+          <label for="feedback-comment">Comentário</label>
+          <textarea id="feedback-comment" rows="3" placeholder="Como foi o treino?"></textarea>
+        </div>
+        <div class="action-bar">
+          <button type="button" class="btn btn--primary" id="btn-save-feedback">💾 Enviar Retorno</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============================================================
+         TAB: AVALIAÇÃO
+    ============================================================ -->
+    <section id="tab-evaluation" class="tab-panel" role="tabpanel" hidden>
+      <h2 class="section-title">Avaliação da Sessão</h2>
+
+      <form id="form-evaluation" class="card form-grid" novalidate>
+        <div class="field">
+          <label for="eval-date">Data</label>
+          <input type="date" id="eval-date" required />
+        </div>
+        <div class="field">
+          <label for="eval-athlete">Aluno</label>
+          <input type="text" id="eval-athlete" placeholder="Nome do aluno" />
+        </div>
+        <div class="field">
+          <label for="eval-duration">Duração (min)</label>
+          <input type="number" id="eval-duration" min="1" placeholder="Ex: 90" />
+        </div>
+        <div class="field">
+          <label for="eval-attempts">Tentativas</label>
+          <input type="number" id="eval-attempts" min="0" placeholder="Ex: 20" />
+        </div>
+        <div class="field field--full">
+          <label for="eval-conclusions">Conclusões</label>
+          <textarea id="eval-conclusions" rows="3" placeholder="O que foi observado?"></textarea>
+        </div>
+
+        <h4 class="form-section-header">Métricas Psicofísicas</h4>
+
+        <div class="field">
+          <label for="eval-rpe">RPE Geral (1–10)</label>
+          <div class="range-wrap">
+            <input type="range" id="eval-rpe" min="1" max="10" value="5" />
+            <output id="eval-rpe-val">5</output>
+          </div>
+        </div>
+        <div class="field">
+          <label for="eval-technique">Técnica (1–10)</label>
+          <div class="range-wrap">
+            <input type="range" id="eval-technique" min="1" max="10" value="5" />
+            <output id="eval-technique-val">5</output>
+          </div>
+        </div>
+        <div class="field">
+          <label for="eval-focus">Foco (1–10)</label>
+          <div class="range-wrap">
+            <input type="range" id="eval-focus" min="1" max="10" value="5" />
+            <output id="eval-focus-val">5</output>
+          </div>
+        </div>
+        <div class="field">
+          <label for="eval-confidence">Confiança (1–10)</label>
+          <div class="range-wrap">
+            <input type="range" id="eval-confidence" min="1" max="10" value="5" />
+            <output id="eval-confidence-val">5</output>
+          </div>
+        </div>
+        <div class="field">
+          <label for="eval-stress">Stress (1–10)</label>
+          <div class="range-wrap">
+            <input type="range" id="eval-stress" min="1" max="10" value="5" />
+            <output id="eval-stress-val">5</output>
+          </div>
+        </div>
+        <div class="field">
+          <label for="eval-motivation">Motivação (1–10)</label>
+          <div class="range-wrap">
+            <input type="range" id="eval-motivation" min="1" max="10" value="5" />
+            <output id="eval-motivation-val">5</output>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button type="button" class="btn btn--primary" id="btn-save-eval">💾 Salvar Avaliação</button>
+        </div>
+      </form>
+
+      <!-- Computed scores preview -->
+      <div id="eval-scores-preview" class="card scores-grid" hidden>
+        <h3 class="sub-title">Métricas Calculadas</h3>
+        <div class="score-item">
+          <span class="score-label">PhysicalLoad</span>
+          <span class="score-value" id="score-physical"></span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">TechScore</span>
+          <span class="score-value" id="score-tech"></span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">MentalScore</span>
+          <span class="score-value" id="score-mental"></span>
+        </div>
+        <div class="score-item">
+          <span class="score-label">SessionVolume</span>
+          <span class="score-value" id="score-volume"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB: DADOS
+    ============================================================ -->
+    <section id="tab-data" class="tab-panel" role="tabpanel" hidden>
+      <h2 class="section-title">Dados &amp; Métricas</h2>
+
+      <div class="action-bar action-bar--left">
+        <button type="button" class="btn btn--secondary" id="btn-export-json">⬇ Exportar JSON</button>
+        <button type="button" class="btn btn--secondary" id="btn-export-csv">⬇ Exportar CSV</button>
+        <button type="button" class="btn btn--danger" id="btn-clear-data">🗑 Limpar Dados</button>
+      </div>
+
+      <div class="card" id="summary-metrics">
+        <h3 class="sub-title">Resumo Geral</h3>
+        <div class="metrics-grid" id="metrics-grid"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="sub-title">Distribuição por Categoria</h3>
+        <div id="category-distribution" class="distribution-list"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="sub-title">Tempo Planejado por Categoria (min)</h3>
+        <div id="category-time" class="distribution-list"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <span>GripMetrics v1.0 · Plataforma de análise de escalada indoor</span>
+  </footer>
+
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
